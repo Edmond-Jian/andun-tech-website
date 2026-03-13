@@ -12,12 +12,32 @@
     {
       "src": "style.css",
       "use": "@vercel/static"
+    },
+    {
+      "src": "blog/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "robots.txt",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "sitemap.xml",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
+    },
+    {
+      "src": "/blog",
+      "dest": "/blog/index.html"
+    },
+    {
+      "src": "/blog/(.*)",
+      "dest": "/blog/$1"
     },
     {
       "src": "/(.*)",
