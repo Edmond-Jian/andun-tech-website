@@ -695,6 +695,8 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // 404
-    res.status(404).json({ success: false, error: 'Not found' });
+    // 404 - log for debugging
+    console.log(`404 - Path not found: ${method} ${path}`);
+    console.log(`Available paths: /api/health, /api/contact, /api/contacts, /api/stats, /api/chat, /api/debug`);
+    res.status(404).json({ success: false, error: 'Not found', path: path, method: method });
 };
