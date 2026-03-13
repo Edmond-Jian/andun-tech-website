@@ -83,6 +83,10 @@ initEmailTransporter();
 const OPENCLAW_GATEWAY_URL = process.env.OPENCLAW_GATEWAY_URL || 'http://127.0.0.1:18789';
 const OPENCLAW_GATEWAY_TOKEN = process.env.OPENCLAW_GATEWAY_TOKEN || 'ollama';
 
+// Discord 通知配置
+const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
+
 // ==================== API 路由 ====================
 
 /**
@@ -328,6 +332,9 @@ async function processNewContact(contactId, contactData) {
 
     // 3. 发送通知给销售团队
     await notifySalesTeam(contactId, contactData);
+
+    // 4. 发送 Discord 通知
+    await notifyDiscord(contactId, contactData);
 }
 
 /**
@@ -535,6 +542,51 @@ async function notifySalesTeam(contactId, contactData) {
         console.log(`✅ Sales team notified: ${salesEmail}`);
     } catch (error) {
         console.error(`❌ Sales notification failed: ${error.message}`);
+    }
+}
+
+/**
+ * 发送 Discord 通知
+ */
+async function notifyDiscord(contactId, contactData) {
+    if (!DISCORD_BOT_TOKEN || !DISCORD_CHANNEL_ID) {
+        console.log('⚠️  Discord notification skipped (not configured)');
+        return;
+    }
+
+    const embed = {
+        title: `📩 新客户咨询 #${contactId}`,
+        color: 0x667eea,
+        fields: [
+            { name: '姓名', value: contactData.name, inline: true },
+            { name: '邮箱', value: contactData.email, inline: true },
+            { name: '服务类型', value: getServiceName(contactData.service), inline: true },
+            { name: '联系电话', value: contactData.phone || '未提供', inline: true },
+            { name: '留言', value: contactData.message || '无', inline: false },
+            { name: '时间', value: new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }), inline: false }
+        ],
+        footer: { text: '安盾科技 - 客户咨询系统' },
+        timestamp: new Date().toISOString()
+    };
+
+    try {
+        const response = await fetch(`https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ embeds: [embed] })
+        });
+
+        if (response.ok) {
+            console.log(`✅ Discord notification sent for contact ${contactId}`);
+        } else {
+            const error = await response.text();
+            console.error(`❌ Discord API error: ${response.status} ${error}`);
+        }
+    } catch (error) {
+        console.error(`❌ Discord notification failed: ${error.message}`);
     }
 }
 
