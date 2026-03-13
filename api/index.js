@@ -226,17 +226,22 @@ async function sendToDiscord(contact) {
     const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
     const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1480530477298356294'; // #ask channel
 
+    console.log('[Discord] Starting sendToDiscord...');
+    console.log('[Discord] Bot Token exists:', !!DISCORD_BOT_TOKEN);
+    console.log('[Discord] Channel ID:', DISCORD_CHANNEL_ID);
+
     const serviceName = getServiceName(contact.service);
 
     const embed = {
-        title: '📩 新客户咨询',
+        title: '📩 新客户咨询（来自网站AI助手）',
         color: 0x667eea,
         fields: [
-            { name: '姓名', value: contact.name, inline: true },
-            { name: '邮箱', value: contact.email, inline: true },
+            { name: '姓名', value: contact.name || '网站访客', inline: true },
+            { name: '邮箱', value: contact.email || '未提供', inline: true },
             { name: '服务类型', value: serviceName, inline: true },
             { name: '联系电话', value: contact.phone || '未提供', inline: true },
-            { name: '留言', value: contact.message || '无', inline: false },
+            { name: '来源', value: '网站AI助手聊天', inline: true },
+            { name: '留言', value: contact.message ? (contact.message.length > 200 ? contact.message.substring(0, 200) + '...' : contact.message) : '无', inline: false },
             { name: '时间', value: new Date(contact.created_at).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }), inline: false }
         ],
         footer: { text: '安盾科技 - 客户咨询系统' },
@@ -246,20 +251,27 @@ async function sendToDiscord(contact) {
     // Try webhook first, then bot API
     if (DISCORD_WEBHOOK_URL) {
         try {
+            console.log('[Discord] Trying webhook...');
             const response = await fetch(DISCORD_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ embeds: [embed] })
             });
-            if (response.ok) return { success: true, method: 'webhook' };
+            if (response.ok) {
+                console.log('[Discord] Webhook success');
+                return { success: true, method: 'webhook' };
+            } else {
+                console.log('[Discord] Webhook failed:', response.status, await response.text());
+            }
         } catch (error) {
-            console.error('Discord webhook failed:', error.message);
+            console.error('[Discord] Webhook error:', error.message);
         }
     }
 
     // Fallback to bot API
     if (DISCORD_BOT_TOKEN && DISCORD_CHANNEL_ID) {
         try {
+            console.log('[Discord] Trying bot API...');
             const response = await fetch(`https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages`, {
                 method: 'POST',
                 headers: {
@@ -268,13 +280,20 @@ async function sendToDiscord(contact) {
                 },
                 body: JSON.stringify({ embeds: [embed] })
             });
-            if (response.ok) return { success: true, method: 'bot_api' };
+            const responseText = await response.text();
+            if (response.ok) {
+                console.log('[Discord] Bot API success');
+                return { success: true, method: 'bot_api' };
+            } else {
+                console.error('[Discord] Bot API failed:', response.status, responseText);
+            }
         } catch (error) {
-            console.error('Discord bot API failed:', error.message);
+            console.error('[Discord] Bot API error:', error.message);
         }
     }
 
-    return { success: false, error: 'No Discord credentials configured' };
+    console.log('[Discord] No credentials configured or all methods failed');
+    return { success: false, error: 'No Discord credentials configured or all methods failed' };
 }
 
 // Paperclip issue creation
