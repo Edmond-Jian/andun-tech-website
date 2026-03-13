@@ -505,13 +505,39 @@
                 timestamp: new Date().toISOString()
             };
 
-            // Store to localStorage for demo (will be replaced with actual API)
-            const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-            contacts.push(formData);
-            localStorage.setItem('contacts', JSON.stringify(contacts));
+            // Try to submit to API first
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
 
-            alert('感谢您的咨询！我们已收到您的信息，工作人员将在24小时内与您联系。');
-            this.reset();
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('感谢您的咨询！我们已收到您的信息，工作人员将在24小时内与您联系。');
+                    this.reset();
+                } else {
+                    // Fallback to localStorage if API fails
+                    console.log('API failed, saving to localStorage:', result.error);
+                    const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+                    contacts.push(formData);
+                    localStorage.setItem('contacts', JSON.stringify(contacts));
+                    alert('感谢您的咨询！我们已收到您的信息，工作人员将在24小时内与您联系。');
+                    this.reset();
+                }
+            } catch (error) {
+                // Fallback to localStorage if API is not available
+                console.log('API not available, saving to localStorage:', error);
+                const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+                contacts.push(formData);
+                localStorage.setItem('contacts', JSON.stringify(contacts));
+                alert('感谢您的咨询！我们已收到您的信息，工作人员将在24小时内与您联系。');
+                this.reset();
+            }
         });
 
         // Navbar scroll effect

@@ -12,10 +12,52 @@
 
 ```
 website/
-├── index.html    # 主页（含 AI 助手聊天组件）
-├── style.css      # 样式文件
-└── README.md      # 部署说明
+├── index.html       # 主页（含 AI 助手聊天组件）
+├── style.css        # 样式文件
+├── README.md        # 本文档
+├── api/             # 后端 API 服务
+│   ├── server-simple.js  # 主服务文件
+│   ├── package.json      # 依赖配置
+│   ├── admin/            # 管理后台
+│   └── data/             # 数据存储
+└── tests/            # 测试文件
 ```
+
+## 客户回馈功能（新增）
+
+网站已集成完整的客户回馈功能：
+
+### 1. 前端（index.html）
+- 联系表单提交到 `/api/contact`
+- 自动回退到 localStorage（当 API 不可用时）
+
+### 2. 后端 API（api/）
+- **接收表单**: `/api/contact` - 接收客户联系信息
+- **邮件通知**: 发送欢迎邮件给客户，通知销售团队
+- **Agent 通知**: 通过 OpenClaw Gateway 通知 AI Agent
+- **预约管理**: `/api/contacts/:id/appointments` - 创建预约
+- **管理后台**: `/admin` - 客户管理界面
+
+### 3. 工作流程
+```
+客户填写表单 → API 接收 → 发送欢迎邮件
+                           ↓
+                    通知销售团队
+                           ↓
+                    通知 AI Agent
+                           ↓
+              Agent 发送预约邮件 → 添加日程 → 提醒销售跟进
+```
+
+### 4. 启动后端
+
+```bash
+cd api
+npm install
+npm start
+```
+
+详细配置见 [api/README.md](api/README.md)
 
 ## 功能特性
 
