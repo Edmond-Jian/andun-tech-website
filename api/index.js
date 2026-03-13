@@ -356,6 +356,20 @@ module.exports = async (req, res) => {
     // Debug: log the path for troubleshooting
     console.log(`API Request: ${method} ${path}`);
 
+    // Debug endpoint - shows what path Vercel is sending
+    if (path === '/api/debug' && method === 'GET') {
+        res.json({
+            success: true,
+            debug: {
+                url: req.url,
+                path: path,
+                method: method,
+                headers: req.headers
+            }
+        });
+        return;
+    }
+
     // Health check
     if (path === '/api/health' && method === 'GET') {
         res.json({
@@ -575,8 +589,8 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Chat API
-    if (path === '/api/chat' && method === 'POST') {
+    // Chat API - flexible path matching for Vercel routing
+    if ((path === '/api/chat' || path === '/chat') && method === 'POST') {
         const { message, sessionId, context } = req.body;
 
         if (!message || message.trim().length === 0) {
