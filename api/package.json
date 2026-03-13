@@ -2,7 +2,6 @@
   "name": "andun-website-api",
   "version": "1.0.0",
   "description": "Backend API for customer contact handling",
-  "main": "server-simple.js",
   "scripts": {
     "start": "node server-simple.js",
     "dev": "nodemon server-simple.js"
