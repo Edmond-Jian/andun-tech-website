@@ -590,6 +590,48 @@ module.exports = async (req, res) => {
     }
 
     // Chat API - flexible path matching for Vercel routing
+    // Handle GET request for session status
+    const chatSessionMatch = path.match(/^\/api\/chat\/session\/([a-zA-Z0-9_-]+)$/);
+    if (chatSessionMatch && method === 'GET') {
+        const sid = chatSessionMatch[1];
+        const session = chatSessions.get(sid);
+        
+        if (!session) {
+            res.json({
+                success: true,
+                exists: false,
+                messageCount: 0,
+                remainingMessages: CONFIG.maxMessages
+            });
+            return;
+        }
+        
+        res.json({
+            success: true,
+            exists: true,
+            messageCount: session.messageCount,
+            remainingMessages: CONFIG.maxMessages - session.messageCount
+        });
+        return;
+    }
+    
+    // Handle GET request to /api/chat - return status
+    if ((path === '/api/chat' || path === '/chat') && method === 'GET') {
+        res.json({
+            success: true,
+            endpoint: '/api/chat',
+            status: 'ready',
+            message: 'Chat API is running. Use POST method to send messages.',
+            usage: {
+                method: 'POST',
+                endpoint: '/api/chat',
+                body: { message: 'your question', sessionId: 'optional' }
+            }
+        });
+        return;
+    }
+    
+    // Handle POST request to /api/chat
     if ((path === '/api/chat' || path === '/chat') && method === 'POST') {
         const { message, sessionId, context } = req.body;
 
@@ -665,31 +707,6 @@ module.exports = async (req, res) => {
             success: true,
             response: aiResult.response,
             sessionId: sid,
-            remainingMessages: CONFIG.maxMessages - session.messageCount
-        });
-        return;
-    }
-
-    // Get chat session status
-    const sessionMatch = path.match(/^\/api\/chat\/session\/([a-zA-Z0-9_-]+)$/);
-    if (sessionMatch && method === 'GET') {
-        const sid = sessionMatch[1];
-        const session = chatSessions.get(sid);
-        
-        if (!session) {
-            res.json({
-                success: true,
-                exists: false,
-                messageCount: 0,
-                remainingMessages: CONFIG.maxMessages
-            });
-            return;
-        }
-        
-        res.json({
-            success: true,
-            exists: true,
-            messageCount: session.messageCount,
             remainingMessages: CONFIG.maxMessages - session.messageCount
         });
         return;
