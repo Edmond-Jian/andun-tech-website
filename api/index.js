@@ -1,6 +1,6 @@
 /**
  * Vercel Serverless Function - Contact API
- * 
+ *
  * This file handles contact form submissions in Vercel's serverless environment.
  * Sends notifications to Discord and creates Paperclip issues.
  */
@@ -106,34 +106,34 @@ const PRODUCT_KNOWLEDGE = {
 // Generate AI response
 function generateAIResponse(userMessage, sessionContext) {
   const lowerMessage = userMessage.toLowerCase();
-  
+
   // Contact info detection
   const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
   const phonePattern = /1[3-9]\d{9}/;
   const wechatPattern = /微信|wechat|wx/i;
-  
+
   const email = userMessage.match(emailPattern);
   const phone = userMessage.match(phonePattern);
-  
+
   if (email || phone || wechatPattern.test(userMessage)) {
     let contactInfo = '';
     if (email) contactInfo += `邮箱：${email[0]}\n`;
     if (phone) contactInfo += `电话：${phone[0]}\n`;
-    
+
     return {
       response: `感谢您留下联系方式！\n\n${contactInfo}\n我们的安全专家将在 24 小时内与您联系，为您提供专业的咨询服务。\n\n如有其他问题，欢迎随时咨询！`,
       hasContact: true,
       contactInfo: { email: email?.[0], phone: phone?.[0] }
     };
   }
-  
+
   // Price inquiry
   if (lowerMessage.includes('价格') || lowerMessage.includes('多少钱') || lowerMessage.includes('收费')) {
     return {
       response: `📋 **服务价格一览**\n\n**单项服务：**\n• 🔐 OpenClaw 安全审计：¥5,000 - ¥8,000\n• ⚙️ AI 配置审查：¥3,000 - ¥5,000\n• 💰 Token 成本优化：¥3,000 起\n• 💡 安全咨询：¥500/小时\n\n**套餐方案：**\n• 🚀 创业套餐：¥15,000（含审计+审查+咨询）\n• 🏢 成长套餐：¥35,000（全面安全服务）\n\n首次咨询可享受 8 折优惠！您对哪个服务感兴趣？`
     };
   }
-  
+
   // OpenClaw audit
   if (lowerMessage.includes('openclaw') || lowerMessage.includes('安全审计')) {
     const service = PRODUCT_KNOWLEDGE.services.find(s => s.id === 'openclaw-audit');
@@ -141,7 +141,7 @@ function generateAIResponse(userMessage, sessionContext) {
       response: `🔐 **${service.name}**\n\n${service.description}\n\n**价格：${service.price}**\n\n**包含内容：**\n${service.features.map(f => '• ' + f).join('\n')}\n\n**适合客户：**${service.targetCustomers}\n\n**常见问题：**\n• 审计周期：${service.commonQuestions['时间']}\n• 报告内容：${service.commonQuestions['内容']}\n\n需要预约咨询吗？留下您的联系方式，我们会有专人与您沟通。`
     };
   }
-  
+
   // Config review
   if (lowerMessage.includes('配置审查') || lowerMessage.includes('配置优化')) {
     const service = PRODUCT_KNOWLEDGE.services.find(s => s.id === 'ai-config-review');
@@ -149,7 +149,7 @@ function generateAIResponse(userMessage, sessionContext) {
       response: `⚙️ **${service.name}**\n\n${service.description}\n\n**价格：${service.price}**\n\n**包含内容：**\n${service.features.map(f => '• ' + f).join('\n')}\n\n**支持的 AI 工具：**\n• OpenClaw\n• Cursor\n• GitHub Copilot\n• 其他主流 AI 助手\n\n**交付时间：**${service.commonQuestions['时间']}\n\n需要了解更多吗？留下您的联系方式，我们会为您详细解答。`
     };
   }
-  
+
   // Token optimization
   if (lowerMessage.includes('token') || lowerMessage.includes('成本') || lowerMessage.includes('节省')) {
     const service = PRODUCT_KNOWLEDGE.services.find(s => s.id === 'token-optimization');
@@ -157,7 +157,7 @@ function generateAIResponse(userMessage, sessionContext) {
       response: `💰 **${service.name}**\n\n${service.description}\n\n**价格：${service.price}**\n\n**为什么选择我们：**\n${service.benefits.map(b => '• ' + b).join('\n')}\n\n**包含内容：**\n${service.features.map(f => '• ' + f).join('\n')}\n\n**效果保障：**${service.commonQuestions['退款']}\n\n很多客户发现 AI 助手一天 Token 消耗数百美元，经我们优化后成本平均降低 30-60%。需要预约分析吗？`
     };
   }
-  
+
   // Consulting
   if (lowerMessage.includes('咨询') || lowerMessage.includes('问答') || lowerMessage.includes('建议')) {
     const service = PRODUCT_KNOWLEDGE.services.find(s => s.id === 'security-consulting');
@@ -165,35 +165,35 @@ function generateAIResponse(userMessage, sessionContext) {
       response: `💡 **${service.name}**\n\n${service.description}\n\n**价格：${service.price}**\n\n**咨询范围：**\n${service.commonQuestions['范围']}\n\n**咨询方式：**${service.commonQuestions['方式']}\n**响应时间：**${service.commonQuestions['时间']}\n\n您有什么具体问题需要咨询？可以直接描述，或者留下联系方式预约咨询时间。`
     };
   }
-  
+
   // Packages
   if (lowerMessage.includes('套餐') || lowerMessage.includes('创业') || lowerMessage.includes('成长') || lowerMessage.includes('小企业')) {
     return {
       response: `📦 **套餐方案**\n\n**🚀 创业套餐 - ¥15,000**\n适合：个人创业者、初创企业\n包含：\n• OpenClaw 安全审计 x2次\n• AI 配置审查 x2次\n• 安全咨询 x2小时\n• 季度安全报告\n• 邮件支持\n\n**🏢 成长套餐 - ¥35,000**\n适合：小型企业\n包含：\n• OpenClaw 安全审计 x5次\n• AI 配置审查 x5次\n• 安全咨询 x10小时\n• 月度安全报告\n• 专属技术支持\n• 紧急响应服务\n\n您是企业还是个人使用？我可以帮您推荐最合适的方案。`
     };
   }
-  
+
   // Data security
   if (lowerMessage.includes('数据') && (lowerMessage.includes('安全') || lowerMessage.includes('保护'))) {
     return {
       response: `🔒 **AI 系统数据安全保障**\n\n保护 AI 系统数据安全的关键措施：\n\n**1. 最小权限原则**\n只授予 AI 工具必要的权限，避免过度授权\n\n**2. 敏感信息过滤**\n自动识别和标记敏感内容，防止泄露\n\n**3. 数据访问控制**\n限制 AI 访问敏感文件和目录\n\n**4. 审计日志**\n记录 AI 的所有操作，可追溯可审计\n\n**5. 定期安全审计**\n定期检查配置变更和安全漏洞\n\n我们可以帮您进行 AI 配置审查（¥3,000 - ¥5,000），确保您的 AI 系统符合安全标准。需要预约吗？`
     };
   }
-  
+
   // Company info
   if (lowerMessage.includes('公司') || lowerMessage.includes('关于') || lowerMessage.includes('介绍')) {
     return {
       response: `🛡️ **关于安盾科技**\n\n${PRODUCT_KNOWLEDGE.company.description}\n\n**核心服务：**\n• OpenClaw 安全审计\n• AI 配置审查\n• Token 成本优化\n• 安全咨询\n\n**为什么选择我们：**\n• 专业团队，深耕 AI 安全领域\n• 严格保密，确保客户数据安全\n• 24小时响应，快速交付\n\n**联系方式：**\n• 📧 邮箱：${PRODUCT_KNOWLEDGE.company.contact.email}\n• 💬 Discord：${PRODUCT_KNOWLEDGE.company.contact.discord}\n• ⏰ 工作时间：${PRODUCT_KNOWLEDGE.company.contact.hours}\n\n有什么可以帮您的？`
     };
   }
-  
+
   // Contact/appointment
   if (lowerMessage.includes('预约') || lowerMessage.includes('联系') || lowerMessage.includes('咨询')) {
     return {
       response: `📅 **预约咨询**\n\n您可以通过以下方式联系我们：\n\n• 📧 邮箱：contact@andun.io\n• 💬 Discord：https://discord.com/invite/clawd\n• 📞 电话：留下您的号码，我们会回拨\n\n**工作时间：** 周一至周五 9:00 - 18:00\n\n**快速咨询：**\n直接在此留下您的联系方式（邮箱/电话），我们的安全专家会在 24 小时内与您联系。\n\n请问您想咨询哪个服务？`
     };
   }
-  
+
   // Default response
   const remainingMessages = CONFIG.maxMessages - (sessionContext?.messageCount || 0) - 1;
   return {
@@ -227,7 +227,7 @@ async function sendToDiscord(contact) {
     const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID || '1480530477298356294'; // #ask channel
 
     const serviceName = getServiceName(contact.service);
-    
+
     const embed = {
         title: '📩 新客户咨询',
         color: 0x667eea,
@@ -288,7 +288,7 @@ async function createPaperclipIssue(contact) {
     }
 
     const serviceName = getServiceName(contact.service);
-    
+
     const issueData = {
         title: `客户咨询：${contact.name} - ${serviceName}`,
         description: `## 客户信息\n\n**姓名**：${contact.name}\n**邮箱**：${contact.email}\n**电话**：${contact.phone || '未提供'}\n**服务类型**：${serviceName}\n\n## 留言\n\n${contact.message || '无'}\n\n---\n*提交时间：${new Date(contact.created_at).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}*`,
@@ -352,10 +352,11 @@ module.exports = async (req, res) => {
     // Handle both Vercel's path format and direct path
     const path = req.url.split('?')[0];
     const method = req.method;
-    
+
     // Debug: log the path for troubleshooting
     console.log(`API Request: ${method} ${path}`);
-
+    console.log(`Full URL: ${req.url}`);
+    
     // Debug endpoint - shows what path Vercel is sending
     if (path === '/api/debug' && method === 'GET') {
         res.json({
@@ -365,6 +366,32 @@ module.exports = async (req, res) => {
                 path: path,
                 method: method,
                 headers: req.headers
+            }
+        });
+        return;
+    }
+
+    // Debug: Return path info for /api/chat GET to see what's happening
+    if ((path === '/api/chat' || path === '/chat' || path.includes('/chat')) && method === 'GET') {
+        res.json({
+            success: true,
+            endpoint: '/api/chat',
+            status: 'ready',
+            debug: {
+                receivedPath: path,
+                receivedMethod: method,
+                receivedUrl: req.url,
+                pathMatches: {
+                    '/api/chat': path === '/api/chat',
+                    '/chat': path === '/chat',
+                    'includes/chat': path.includes('/chat')
+                }
+            },
+            message: 'Chat API is running. Use POST method to send messages.',
+            usage: {
+                method: 'POST',
+                endpoint: '/api/chat',
+                body: { message: 'your question', sessionId: 'optional' }
             }
         });
         return;
@@ -463,7 +490,7 @@ module.exports = async (req, res) => {
 
         // Wait for all notifications but don't fail if some fail
         const results = await Promise.allSettled(notifications);
-        
+
         // Log results
         console.log('Notification results:', results.map(r => r.value || r.reason));
 
@@ -565,12 +592,12 @@ module.exports = async (req, res) => {
             created_at: new Date().toISOString()
         };
         appointments.push(newAppointment);
-        
+
         // Update contact status
         const index = contacts.findIndex(c => c.id === contactId);
         contacts[index].status = 'scheduled';
         contacts[index].appointment_time = scheduled_time;
-        
+
         res.json({ success: true, appointmentId: newAppointment.id, message: '预约创建成功' });
         return;
     }
@@ -595,7 +622,7 @@ module.exports = async (req, res) => {
     if (chatSessionMatch && method === 'GET') {
         const sid = chatSessionMatch[1];
         const session = chatSessions.get(sid);
-        
+
         if (!session) {
             res.json({
                 success: true,
@@ -605,7 +632,7 @@ module.exports = async (req, res) => {
             });
             return;
         }
-        
+
         res.json({
             success: true,
             exists: true,
@@ -614,7 +641,7 @@ module.exports = async (req, res) => {
         });
         return;
     }
-    
+
     // Handle GET request to /api/chat - return status
     if ((path === '/api/chat' || path === '/chat') && method === 'GET') {
         res.json({
@@ -630,7 +657,7 @@ module.exports = async (req, res) => {
         });
         return;
     }
-    
+
     // Handle POST request to /api/chat
     if ((path === '/api/chat' || path === '/chat') && method === 'POST') {
         const { message, sessionId, context } = req.body;
@@ -642,7 +669,7 @@ module.exports = async (req, res) => {
 
         // Create or get session
         const sid = sessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
+
         if (!chatSessions.has(sid)) {
             chatSessions.set(sid, {
                 messageCount: 0,
@@ -650,9 +677,9 @@ module.exports = async (req, res) => {
                 messages: []
             });
         }
-        
+
         const session = chatSessions.get(sid);
-        
+
         // Check message limit
         if (session.messageCount >= CONFIG.maxMessages) {
             res.json({
@@ -664,18 +691,18 @@ module.exports = async (req, res) => {
             });
             return;
         }
-        
+
         // Record user message
         session.messages.push({ role: 'user', content: message, timestamp: new Date() });
         session.messageCount++;
-        
+
         // Generate response
         const aiResult = generateAIResponse(message, session);
-        
+
         // Record assistant response
         session.messages.push({ role: 'assistant', content: aiResult.response, timestamp: new Date() });
         session.lastActivity = new Date();
-        
+
         // If contains contact info, save to contacts
         if (aiResult.hasContact) {
             const newContact = {
@@ -689,12 +716,12 @@ module.exports = async (req, res) => {
                 created_at: new Date().toISOString()
             };
             contacts.unshift(newContact);
-            
+
             // Send notifications (async, don't wait)
             sendToDiscord(newContact).catch(err => console.error('Discord notification failed:', err));
             createPaperclipIssue(newContact).catch(err => console.error('Paperclip issue creation failed:', err));
         }
-        
+
         // Clean up old sessions (keep for 30 minutes)
         const now = Date.now();
         for (const [key, value] of chatSessions.entries()) {
@@ -702,7 +729,7 @@ module.exports = async (req, res) => {
                 chatSessions.delete(key);
             }
         }
-        
+
         res.json({
             success: true,
             response: aiResult.response,
@@ -717,10 +744,10 @@ module.exports = async (req, res) => {
     console.log(`Available paths: /api/health, /api/contact, /api/contacts, /api/stats, /api/chat, /api/debug`);
     console.log(`Request URL: ${req.url}`);
     console.log(`Request headers: ${JSON.stringify(req.headers)}`);
-    res.status(404).json({ 
-        success: false, 
-        error: 'Not found', 
-        path: path, 
+    res.status(404).json({
+        success: false,
+        error: 'Not found',
+        path: path,
         method: method,
         url: req.url,
         availablePaths: ['/api/health', '/api/contact', '/api/contacts', '/api/stats', '/api/chat', '/api/debug']
