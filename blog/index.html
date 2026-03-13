@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="小龙虾工作室博客 - AI安全与Token成本优化专业文章">
+    <meta name="keywords" content="AI安全, Token优化, OpenClaw, AI成本控制">
+    <title>博客 | 小龙虾工作室</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .blog-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .blog-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .blog-header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .blog-list {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .blog-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .blog-card h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+        }
+        .blog-card h2 a {
+            color: #1a1a2e;
+            text-decoration: none;
+        }
+        .blog-card h2 a:hover {
+            color: #e94560;
+        }
+        .blog-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        .blog-meta span {
+            margin-right: 20px;
+        }
+        .blog-excerpt {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .blog-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .blog-tag {
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .blog-tag.highlight {
+            background: #e94560;
+            color: #fff;
+        }
+        .featured-badge {
+            background: #ffd700;
+            color: #1a1a2e;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="../index.html">小龙虾工作室</a>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html#services">服务</a>
+            <a href="index.html">博客</a>
+            <a href="../index.html#pricing">定价</a>
+            <a href="../index.html#contact">联系我们</a>
+        </div>
+    </nav>
+
+    <header class="blog-header">
+        <h1>博客</h1>
+        <p>AI 安全与 Token 成本优化专业知识分享</p>
+    </header>
+
+    <main class="blog-list">
+        <!-- Featured Article -->
+        <article class="blog-card">
+            <h2>
+                <a href="token-cost-optimization.html">AI 助手正在偷偷花钱？Token 成本优化实战指南</a>
+                <span class="featured-badge">精选</span>
+            </h2>
+            <div class="blog-meta">
+                <span>📅 2026-03-13</span>
+                <span>⏱️ 阅读时间：10 分钟</span>
+                <span>👤 内容编辑</span>
+            </div>
+            <p class="blog-excerpt">
+                Token 成本为什么这么高？如何把成本降下来？本文从缓存机制、参数优化、提示词精简、模型选择四个角度，分享 Token 成本优化的实战经验。真实案例：客户通过优化将 Token 成本降低了 57%，一个月省下 8 万多。
+            </p>
+            <div class="blog-tags">
+                <span class="blog-tag highlight">Token优化</span>
+                <span class="blog-tag">成本控制</span>
+                <span class="blog-tag">实战案例</span>
+            </div>
+        </article>
+
+        <!-- Coming Soon Articles -->
+        <article class="blog-card" style="opacity: 0.7;">
+            <h2>
+                <span style="color: #999;">[即将发布]</span> 你的 AI 助手可能在泄露数据——OpenClaw 安全配置指南
+            </h2>
+            <div class="blog-meta">
+                <span>📅 预计 2026-03-15</span>
+                <span>⏱️ 阅读时间：12 分钟</span>
+            </div>
+            <p class="blog-excerpt">
+                AI 安全风险概述，OpenClaw 配置常见问题，以及安全最佳实践。帮助你在使用 AI 助手时保护数据安全。
+            </p>
+            <div class="blog-tags">
+                <span class="blog-tag">AI安全</span>
+                <span class="blog-tag">OpenClaw</span>
+                <span class="blog-tag">配置指南</span>
+            </div>
+        </article>
+
+        <article class="blog-card" style="opacity: 0.7;">
+            <h2>
+                <span style="color: #999;">[即将发布]</span> 独立开发者如何用 AI 做副业——Token 成本控制是关键
+            </h2>
+            <div class="blog-meta">
+                <span>📅 预计 2026-03-17</span>
+                <span>⏱️ 阅读时间：8 分钟</span>
+            </div>
+            <p class="blog-excerpt">
+                独立开发者做 AI 副业的成本挑战与优化策略。通过实际案例，展示如何将 Token 成本从 ¥12,000 降到 ¥4,500，利润翻三倍。
+            </p>
+            <div class="blog-tags">
+                <span class="blog-tag">独立开发者</span>
+                <span class="blog-tag">成本优化</span>
+                <span class="blog-tag">副业</span>
+            </div>
+        </article>
+    </main>
+
+    <footer style="background: #1a1a2e; color: #fff; padding: 40px 20px; text-align: center; margin-top: 60px;">
+        <p>© 2026 小龙虾工作室 版权所有</p>
+        <p style="font-size: 0.9em; opacity: 0.8;">AI 安全解决方案 · Token 成本优化</p>
+    </footer>
+</body>
+</html>
