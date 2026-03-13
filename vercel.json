@@ -1,11 +1,11 @@
 {
   "rewrites": [
-    { "source": "/api/chat", "destination": "/api/index.js" },
-    { "source": "/api/contact", "destination": "/api/index.js" },
-    { "source": "/api/health", "destination": "/api/index.js" },
-    { "source": "/api/stats", "destination": "/api/index.js" },
-    { "source": "/api/debug", "destination": "/api/index.js" },
-    { "source": "/api/contacts/:path*", "destination": "/api/index.js" },
-    { "source": "/admin", "destination": "/api/admin/index.js" }
+    { "source": "/api/chat", "destination": "/api" },
+    { "source": "/api/contact", "destination": "/api" },
+    { "source": "/api/health", "destination": "/api" },
+    { "source": "/api/stats", "destination": "/api" },
+    { "source": "/api/debug", "destination": "/api" },
+    { "source": "/api/contacts/(.*)", "destination": "/api" },
+    { "source": "/admin", "destination": "/api/admin" }
   ]
 }
