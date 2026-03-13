@@ -1,11 +1,8 @@
 {
-  "rewrites": [
-    { "source": "/api/chat", "destination": "/api" },
-    { "source": "/api/contact", "destination": "/api" },
-    { "source": "/api/health", "destination": "/api" },
-    { "source": "/api/stats", "destination": "/api" },
-    { "source": "/api/debug", "destination": "/api" },
-    { "source": "/api/contacts/(.*)", "destination": "/api" },
-    { "source": "/admin", "destination": "/api/admin" }
-  ]
+  "functions": {
+    "api/index.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
