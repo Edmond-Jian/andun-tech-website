@@ -349,8 +349,12 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // Handle both Vercel's path format and direct path
     const path = req.url.split('?')[0];
     const method = req.method;
+    
+    // Debug: log the path for troubleshooting
+    console.log(`API Request: ${method} ${path}`);
 
     // Health check
     if (path === '/api/health' && method === 'GET') {
