@@ -397,17 +397,19 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Health check
+    // Health check - includes version for deployment verification
     if (path === '/api/health' && method === 'GET') {
         res.json({
             status: 'ok',
+            version: '2026-03-13-v14',
             timestamp: new Date().toISOString(),
             services: {
                 email: emailTransporter ? 'configured' : 'not_configured',
                 discord: process.env.DISCORD_BOT_TOKEN ? 'configured' : 'not_configured',
                 paperclip: process.env.PAPERCLIP_API_KEY ? 'configured' : 'not_configured',
                 database: 'memory'
-            }
+            },
+            endpoints: ['/api/health', '/api/contact', '/api/contacts', '/api/stats', '/api/chat', '/api/debug']
         });
         return;
     }
