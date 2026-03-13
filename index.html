@@ -536,11 +536,12 @@
         // Configuration
         const CONFIG = {
             maxMessages: 10,
-            apiEndpoint: '/api/chat', // Will be replaced with actual API endpoint
+            apiEndpoint: '/api/chat',
             contactFormEndpoint: '/api/contact'
         };
 
         // State
+        let sessionId = localStorage.getItem('chatSessionId') || null;
         let messageCount = 0;
         let isWaiting = false;
 
@@ -622,55 +623,15 @@
         const chatQuickActions = document.getElementById('chatQuickActions');
         const chatLimit = document.getElementById('chatLimit');
 
-        // Local AI responses (will be enhanced with real API)
-        const localResponses = {
-            'openclaw 安全审计包括哪些内容？': 'OpenClaw 安全审计主要包括以下内容：<br><br>1. <strong>配置文件审查</strong> - 检查工具权限、敏感信息处理<br>2. <strong>工具权限分析</strong> - 确保最小权限原则<br>3. <strong>数据流分析</strong> - 追踪数据访问路径<br>4. <strong>安全漏洞检测</strong> - 识别潜在安全风险<br>5. <strong>修复建议</strong> - 提供详细修复方案<br><br>审计服务价格为 ¥5,000 - ¥8,000。需要预约吗？',
-            '如何保护 ai 系统的数据安全？': '保护 AI 系统数据安全的关键措施：<br><br>1. <strong>最小权限原则</strong> - 只授予必要的工具权限<br>2. <strong>敏感信息过滤</strong> - 标记敏感内容<br>3. <strong>数据访问控制</strong> - 限制 AI 访问敏感文件<br>4. <strong>审计日志</strong> - 记录 AI 的所有操作<br>5. <strong>定期安全审计</strong> - 定期检查配置变更<br><br>我们可以帮您进行 AI 配置审查（¥3,000 - ¥5,000）。',
-            '你们的服务价格是怎样的？': '我们的服务价格如下：<br><br>🔐 <strong>OpenClaw 安全审计</strong><br>¥5,000 - ¥8,000<br><br>⚙️ <strong>AI 配置审查</strong><br>¥3,000 - ¥5,000<br><br>💡 <strong>安全咨询</strong><br>¥500/小时<br><br>🚀 <strong>创业套餐</strong> ¥15,000<br>🏢 <strong>成长套餐</strong> ¥35,000<br><br>首次咨询可享受 8 折优惠！',
-            '你们的服务价格是多少？': '我们的服务价格如下：<br><br>🔐 <strong>OpenClaw 安全审计</strong><br>¥5,000 - ¥8,000<br><br>⚙️ <strong>AI 配置审查</strong><br>¥3,000 - ¥5,000<br><br>💡 <strong>安全咨询</strong><br>¥500/小时<br><br>🚀 <strong>创业套餐</strong> ¥15,000<br>🏢 <strong>成长套餐</strong> ¥35,000<br><br>首次咨询可享受 8 折优惠！',
-            '价格': '我们的服务价格如下：<br><br>🔐 <strong>OpenClaw 安全审计</strong><br>¥5,000 - ¥8,000<br><br>⚙️ <strong>AI 配置审查</strong><br>¥3,000 - ¥5,000<br><br>💡 <strong>安全咨询</strong><br>¥500/小时<br><br>🚀 <strong>创业套餐</strong> ¥15,000<br>🏢 <strong>成长套餐</strong> ¥35,000<br><br>首次咨询可享受 8 折优惠！',
-            'default': '感谢您的提问！<br><br>我是安盾 AI 助手，可以帮您解答关于 AI 安全的问题。<br><br>您可以问我：<br>• OpenClaw 安全审计内容<br>• 数据安全保护方法<br>• 服务价格咨询<br><br>或留下您的联系方式，我们的安全专家会尽快与您沟通。'
-        };
-
-        // Function to detect contact information
-        function containsContactInfo(text) {
-            const lowerText = text.toLowerCase();
-            // Email pattern
-            const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-            // Phone pattern (Chinese mobile numbers)
-            const phonePattern = /1[3-9]\d{9}/;
-            // WeChat pattern
-            const wechatPattern = /微信|wechat|wx/i;
-            // Contact keywords
-            const contactKeywords = /联系方式|电话|手机|邮箱|联系我|回电|联系电话/;
-            
-            return emailPattern.test(text) || 
-                   phonePattern.test(text) || 
-                   wechatPattern.test(lowerText) ||
-                   contactKeywords.test(text);
-        }
-
-        // Function to generate contact acknowledgment response
-        function getContactResponse(text) {
-            const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-            const phonePattern = /1[3-9]\d{9}/;
-            
-            let contactInfo = '';
-            const email = text.match(emailPattern);
-            const phone = text.match(phonePattern);
-            
-            if (email) contactInfo += `邮箱：${email[0]}<br>`;
-            if (phone) contactInfo += `电话：${phone[0]}<br>`;
-            
-            return `感谢您留下联系方式！${contactInfo ? '<br><br>' + contactInfo : ''}<br><br>我们的安全专家将在 24 小时内与您联系，为您提供专业的咨询服务。<br><br>如有其他问题，欢迎随时咨询！`;
-        }
-
         // Toggle chat window
         chatToggle.addEventListener('click', () => {
             chatWindow.classList.toggle('open');
             if (chatWindow.classList.contains('open')) {
                 chatInput.focus();
-                updateMessageLimit();
+                // Sync session state from server if we have a sessionId
+                if (sessionId) {
+                    syncSessionState();
+                }
             }
         });
 
@@ -679,11 +640,14 @@
         });
 
         // Update message limit display
-        function updateMessageLimit() {
-            const remaining = CONFIG.maxMessages - messageCount;
+        function updateMessageLimit(remaining) {
             chatLimit.textContent = `剩余对话: ${remaining} 条`;
             if (remaining <= 0) {
                 chatLimit.style.color = '#e74c3c';
+            } else if (remaining <= 3) {
+                chatLimit.style.color = '#f39c12';
+            } else {
+                chatLimit.style.color = '';
             }
         }
 
@@ -691,8 +655,12 @@
         function addMessage(content, isUser = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+            // Convert markdown-style bold to HTML
+            const formattedContent = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
             messageDiv.innerHTML = `
-                <div class="message-content">${content}</div>
+                <div class="message-content">${formattedContent}</div>
             `;
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -713,21 +681,24 @@
             if (typing) typing.remove();
         }
 
-        // Get AI response
+        // Sync session state from server
+        async function syncSessionState() {
+            if (!sessionId) return;
+            
+            try {
+                const response = await fetch(`/api/chat/session/${sessionId}`);
+                const data = await response.json();
+                if (data.success && data.exists) {
+                    messageCount = data.messageCount;
+                    updateMessageLimit(data.remainingMessages);
+                }
+            } catch (error) {
+                console.log('Failed to sync session state');
+            }
+        }
+
+        // Get AI response from API
         async function getAIResponse(userMessage) {
-            // First check if user provided contact information
-            if (containsContactInfo(userMessage)) {
-                return getContactResponse(userMessage);
-            }
-
-            // Check local responses for common questions
-            const localKey = userMessage.toLowerCase();
-            if (localResponses[localKey]) {
-                return localResponses[localKey];
-            }
-
-            // For other messages, try to call API
-            // If API is not available, use default response
             try {
                 const response = await fetch(CONFIG.apiEndpoint, {
                     method: 'POST',
@@ -736,30 +707,44 @@
                     },
                     body: JSON.stringify({
                         message: userMessage,
+                        sessionId: sessionId,
                         context: 'website_chat'
                     })
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
-                    return data.response;
+                    
+                    // Update session ID if new
+                    if (data.sessionId && data.sessionId !== sessionId) {
+                        sessionId = data.sessionId;
+                        localStorage.setItem('chatSessionId', sessionId);
+                    }
+                    
+                    // Update message count from server
+                    messageCount = CONFIG.maxMessages - data.remainingMessages;
+                    updateMessageLimit(data.remainingMessages);
+                    
+                    return { response: data.response, limitReached: data.limitReached };
                 }
             } catch (error) {
-                // API not available, use local responses
-                console.log('API not available, using local response');
+                console.log('API not available:', error);
             }
 
-            // Return default response
-            return localResponses['default'];
+            // Fallback to default response
+            return { 
+                response: '抱歉，系统暂时无法响应。请稍后再试或留下您的联系方式（邮箱或电话），我们的安全专家会尽快与您联系。', 
+                limitReached: false 
+            };
         }
 
         // Send message
         async function sendMessage(text) {
             if (!text.trim() || isWaiting) return;
 
-            // Check message limit
+            // Check message limit (local check for UI)
             if (messageCount >= CONFIG.maxMessages) {
-                addMessage('您已达到对话次数限制（' + CONFIG.maxMessages + ' 条）。请留下您的联系方式，我们的工作人员会与您详细沟通。', false);
+                addMessage('您已达到对话次数限制（' + CONFIG.maxMessages + ' 条）。\n\n请留下您的联系方式（邮箱或电话），我们的安全专家会与您详细沟通，为您提供专业建议。\n\n📧 邮箱：contact@andun.io\n💬 Discord：https://discord.com/invite/clawd', false);
                 return;
             }
 
@@ -768,7 +753,7 @@
             // Add user message
             addMessage(text, true);
             messageCount++;
-            updateMessageLimit();
+            updateMessageLimit(CONFIG.maxMessages - messageCount);
 
             // Hide quick actions after first message
             chatQuickActions.style.display = 'none';
@@ -778,12 +763,16 @@
 
             // Get AI response
             try {
-                const response = await getAIResponse(text);
+                const result = await getAIResponse(text);
                 hideTyping();
-                addMessage(response);
+                addMessage(result.response);
+                
+                if (result.limitReached) {
+                    updateMessageLimit(0);
+                }
             } catch (error) {
                 hideTyping();
-                addMessage('抱歉，系统暂时无法响应。请稍后再试或留下您的联系方式。');
+                addMessage('抱歉，系统暂时无法响应。请稍后再试或留下您的联系方式（邮箱或电话）。');
             }
 
             chatInput.value = '';
@@ -809,8 +798,13 @@
             });
         });
 
-        // Initialize message limit
-        updateMessageLimit();
+        // Initialize message limit display
+        updateMessageLimit(CONFIG.maxMessages);
+        
+        // Sync session state on page load if we have a session
+        if (sessionId) {
+            syncSessionState();
+        }
     </script>
 </body>
 </html>
