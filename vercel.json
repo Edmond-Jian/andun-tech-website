@@ -1,8 +1,11 @@
 {
   "rewrites": [
-    {
-      "source": "/admin",
-      "destination": "/api/admin.js"
-    }
+    { "source": "/api/chat", "destination": "/api/chat.js" },
+    { "source": "/api/chat/:path*", "destination": "/api/chat.js" },
+    { "source": "/api/contact", "destination": "/api/index.js" },
+    { "source": "/api/contacts/:path*", "destination": "/api/index.js" },
+    { "source": "/api/health", "destination": "/api/index.js" },
+    { "source": "/api/stats", "destination": "/api/index.js" },
+    { "source": "/admin", "destination": "/api/admin.js" }
   ]
 }
