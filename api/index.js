@@ -726,7 +726,7 @@ module.exports = async (req, res) => {
         session.messages.push({ role: 'assistant', content: aiResult.response, timestamp: new Date() });
         session.lastActivity = new Date();
 
-        // If contains contact info, save to contacts
+        // If contains contact info, save to contacts and send notifications
         if (aiResult.hasContact) {
             const newContact = {
                 id: contacts.length + 1,
@@ -740,9 +740,16 @@ module.exports = async (req, res) => {
             };
             contacts.unshift(newContact);
 
-            // Send notifications (async, don't wait)
-            sendToDiscord(newContact).catch(err => console.error('Discord notification failed:', err));
-            createPaperclipIssue(newContact).catch(err => console.error('Paperclip issue creation failed:', err));
+            // Send notifications synchronously to ensure they complete in serverless
+            try {
+                const discordResult = await sendToDiscord(newContact);
+                console.log('[Chat] Discord notification result:', JSON.stringify(discordResult));
+            } catch (err) {
+                console.error('[Chat] Discord notification failed:', err.message);
+            }
+            
+            // Paperclip is optional (localhost may not be accessible)
+            createPaperclipIssue(newContact).catch(err => console.error('[Chat] Paperclip issue creation failed:', err.message));
         }
 
         // Clean up old sessions (keep for 30 minutes)
