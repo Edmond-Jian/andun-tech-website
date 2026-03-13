@@ -616,7 +616,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Chat API - flexible path matching for Vercel routing
+    // Version: 2026-03-13-v14 - Force Vercel rebuild
+
+// Chat API - flexible path matching for Vercel routing
     // Handle GET request for session status
     const chatSessionMatch = path.match(/^\/api\/chat\/session\/([a-zA-Z0-9_-]+)$/);
     if (chatSessionMatch && method === 'GET') {
